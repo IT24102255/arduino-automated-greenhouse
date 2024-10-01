@@ -1,3 +1,5 @@
+// Greenhouse Project - P11-1
+
 #define BLYNK_PRINT Serial
 #define BLYNK_TEMPLATE_ID "TMPL69r-yXF-O"
 #define BLYNK_TEMPLATE_NAME "Group P11 1"
@@ -36,6 +38,13 @@ int END_TIME = 24;
 
 DHT dhtSensor(DHT_PIN,DHT11);
 BlynkTimer timer;
+
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = 19800;
+const int   daylightOffset_sec = 0;
+
+int DATA_INTERVAL = 3000L;
+int WiFi_INTERVAL = 60000L;
 
 void connectToWiFi() {
   Serial.println("Connecting to WiFi...");
@@ -92,6 +101,16 @@ BLYNK_WRITE(V17) {
 
 BLYNK_WRITE(V18) {
   END_TIME = param.asInt();
+}
+
+bool isTimeBetween (int startHour, int endHour) {
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time \n");
+    return false;
+  }
+  int currentHour = timeinfo.tm_hour;
+  return currentHour >= startHour && currentHour <= endHour;
 }
 
 void dataReadAndWrite() {
@@ -201,10 +220,12 @@ void setup() {
   dhtSensor.begin();
   connectToWiFi();
 
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+
   Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASSWORD, "blynk.cloud", 80);
   timer.setInterval(DATA_INTERVAL, dataReadAndWrite);
   timer.setInterval(WiFi_INTERVAL, WiFiStatus);
-
+  
   pinMode(4, OUTPUT);
   pinMode(5, OUTPUT);
   pinMode(16, OUTPUT);
@@ -225,5 +246,5 @@ void setup() {
 void loop() {
   Blynk.run();
   timer.run();
-
+  
 }
