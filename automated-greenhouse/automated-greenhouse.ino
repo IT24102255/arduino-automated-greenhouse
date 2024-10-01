@@ -57,6 +57,15 @@ void connectToWiFi() {
   }
 }
 
+void WiFiStatus() {
+  if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("WiFi Status: Not Connected! \n");
+
+    } else {
+      Serial.println("WiFi Status: Connected! \n");
+    }
+}
+
 BLYNK_CONNECTED() {
   Blynk.syncVirtual(V4, V5, V6, V7, V17, V18);
 }
@@ -194,6 +203,7 @@ void setup() {
 
   Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASSWORD, "blynk.cloud", 80);
   timer.setInterval(DATA_INTERVAL, dataReadAndWrite);
+  timer.setInterval(WiFi_INTERVAL, WiFiStatus);
 
   pinMode(4, OUTPUT);
   pinMode(5, OUTPUT);
