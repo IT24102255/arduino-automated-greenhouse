@@ -25,6 +25,14 @@ void setup() {
   Serial.begin(115200);
   dhtSensor.begin();
 
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(16, OUTPUT);
+  pinMode(17, OUTPUT);
+
+  digitalWrite(COOLER_PIN, LOW);
+  digitalWrite(HEATER_PIN, LOW);
+
 }
 
 void loop() {
