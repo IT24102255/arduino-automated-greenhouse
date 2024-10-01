@@ -5,6 +5,7 @@
 
 #define WIFI_SSID "SLT_Fiber"
 #define WIFI_PASSWORD "Walura@458699%"
+#define WIFI_TIMEOUT_MS 20000
 
 #include <Arduino.h>
 #include <DHT.h>
@@ -35,6 +36,26 @@ int END_TIME = 24;
 
 DHT dhtSensor(DHT_PIN,DHT11);
 BlynkTimer timer;
+
+void connectToWiFi() {
+  Serial.println("Connecting to WiFi...");
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  
+  unsigned long startAttemptTime = millis();
+
+  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < WIFI_TIMEOUT_MS) {
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("Connection Failed!");
+
+    } else {
+      Serial.println("WiFi Connected!");
+      Serial.print("Current IP: ");
+      Serial.println(WiFi.localIP());
+
+    }
+  }
+}
 
 BLYNK_CONNECTED() {
   Blynk.syncVirtual(V4, V5, V6, V7, V17, V18);
@@ -169,6 +190,7 @@ void dataReadAndWrite() {
 void setup() {
   Serial.begin(115200);
   dhtSensor.begin();
+  connectToWiFi();
 
   Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASSWORD, "blynk.cloud", 80);
   timer.setInterval(DATA_INTERVAL, dataReadAndWrite);
