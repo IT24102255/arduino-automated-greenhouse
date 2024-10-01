@@ -6,6 +6,8 @@
 #define LDR_PIN 33 // G33 PIN
 #define SM_PIN 32 // G32 PIN
 
+DHT dhtSensor(DHT_PIN,DHT11);
+
 void setup() {
   Serial.begin(115200);
   dhtSensor.begin();
